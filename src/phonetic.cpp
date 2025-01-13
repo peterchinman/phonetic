@@ -2,8 +2,8 @@
 #include <emscripten/bind.h>
 #endif
 
-#include "phonetic.h"
-#include "convenience.h"
+#include "phonetic.hpp"
+#include "convenience.hpp"
 
 #include <fstream>
 #include <iostream>

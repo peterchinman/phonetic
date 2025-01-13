@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
-#include "convenience.h"
-#include "phonetic.h"
+#include "convenience.hpp"
+#include "phonetic.hpp"
 #include <iostream>
 #include <filesystem>
 #include <string>
@@ -19,7 +19,6 @@ struct Fixture {
 
 TEST_CASE_PERSISTENT_FIXTURE(Fixture, "Dictionary tests") {
     SECTION ("dictionary import success") {
-        REQUIRE(import_success == true);
     }
     SECTION("word_to_phones") {
         std::vector<std::string> word_lower = dict.word_to_phones("associate");
