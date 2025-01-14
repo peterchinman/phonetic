@@ -20,7 +20,7 @@ Phonetic::Phonetic() {
 
 bool Phonetic::import_dictionary() {
 
-    const std::string file_path{"../data/CMUdict/cmudict-0.7b"};
+    std::string file_path{"../data/CMUdict/cmudict-0.7b"};
 
     #ifdef __EMSCRIPTEN__   
     file_path = "/data/cmudict-0.7b";
@@ -171,3 +171,21 @@ std::string Phonetic::get_rhyming_part(const std::string& phones) {
     return result;
 }
 
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_BINDINGS(my_module) {
+
+    emscripten::register_vector<std::string>("StringVector");
+
+
+    emscripten::class_<Phonetic>("Phonetic")
+        .constructor<>()
+        .function("word_to_phones", &Phonetic::word_to_phones)
+        .function("text_to_phones", &Phonetic::text_to_phones)
+        .function("phone_to_stress", &Phonetic::phone_to_stress)
+        .function("word_to_stresses", &Phonetic::word_to_stresses)
+        .function("phone_to_syllable_count", &Phonetic::phone_to_syllable_count)
+        .function("word_to_syllable_counts", &Phonetic::word_to_syllable_counts)
+        .function("get_rhyming_part", &Phonetic::get_rhyming_part)
+        ;
+}
+#endif

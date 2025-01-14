@@ -46,7 +46,7 @@ TEST_CASE_PERSISTENT_FIXTURE(Fixture, "Dictionary tests") {
         REQUIRE(stresses[2] == "01");
     }
 
-    SECTION("phone_syllables") {
+    SECTION("phone_to_syllable_count") {
         REQUIRE(dict.phone_to_syllable_count("F AY1 ER0") == 2);
     }
 

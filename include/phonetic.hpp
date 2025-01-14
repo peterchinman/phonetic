@@ -97,6 +97,10 @@ public:
      * @return (string): a string of space-separated phones
     */
     std::string get_rhyming_part(const std::string& phones);
+
+    // TODO implement search
+        // search by phones
+        // search by stress
 };
 
 
