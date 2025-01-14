@@ -20,7 +20,7 @@ Phonetic::Phonetic() {
 
 bool Phonetic::import_dictionary() {
 
-    std::string file_path{"../data/CMUdict/cmudict-0.7b"};
+    std::string file_path = CMU_DICT_PATH;
 
     #ifdef __EMSCRIPTEN__   
     file_path = "/data/cmudict-0.7b";

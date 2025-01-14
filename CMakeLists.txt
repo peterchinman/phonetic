@@ -4,7 +4,6 @@ project(phonetic)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 
-
 # Detect or configure for Emscripten
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set(EMSCRIPTEN ON)
@@ -15,15 +14,7 @@ else()
 endif()
 
 if(EMSCRIPTEN)
-    # # Ensure we're using Emscripten compilers
-    # set(CMAKE_C_COMPILER emcc)
-    # set(CMAKE_CXX_COMPILER em++)
-
-    # Option for specifying the toolchain file
-    # set(CMAKE_TOOLCHAIN_FILE "/usr/local/Cellar/emscripten/3.1.61/libexec/cmake/Modules/Platform/Emscripten.cmake"
-    #     CACHE FILEPATH "Path to the toolchain file for cross-compiling")
-
-    # # Set optimization flags for Release builds
+    # Set optimization flags for Release builds
     set(CMAKE_CXX_FLAGS "-O3")
 
     add_executable(phonetic src/phonetic.cpp)

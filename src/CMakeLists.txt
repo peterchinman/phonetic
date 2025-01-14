@@ -3,6 +3,9 @@ add_library(phonetic
     phonetic.cpp
 )
 
+set(CMU_DICT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../data/CMUdict/cmudict-0.7b")
+target_compile_definitions(phonetic PUBLIC CMU_DICT_PATH="${CMU_DICT_PATH}")
+
 # Include header files
 target_include_directories(phonetic PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>

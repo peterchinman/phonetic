@@ -12,13 +12,6 @@ private:
     // map of words with their CMU ARPABET_pronunciations, separated by spaces
     std::unordered_map<std::string, std::vector<std::string>> m_dictionary {};
 
-    // All vowels used in CMU
-    const std::unordered_set<std::string> CMU_VOWELS = {
-        "AA", "AE", "AH", "AO", "EH",
-        "ER", "IH", "IY", "UH", "UW", // 10 monopthongs
-        "AW", "AY", "EY", "OW", "OY" // 5 dipthongs
-    };
-
 // TODO mark functions as const that don't change state
 
 public:
