@@ -4,15 +4,15 @@ A C++ library for working with the CMU Pronouncing Dictionary
 
 ## Intro
 
-The CMU Pronouncing Dictionary (CMUdict) is
+The [CMU Pronouncing Dictionary](http://www.speech.cs.cmu.edu/cgi-bin/cmudict#about) (CMUdict) is
 
 > an open-source machine-readable pronunciation dictionary for North American English that contains over 134,000 words and their pronunciations.
 
 There's various tooling built around it, e.g. [this lovely Python library](https://github.com/aparrish/pronouncingpy). But I was working in C++ and WebAssembly, and ended up writing my own interface for using CMUdict.
 
-## Installation / Build
+## Build
 
-You can include use this in your own projects, you'll just need the header file (`include/phonetic.hpp`), the source file (`src/phonetic.cpp`), and the CMUdict data, which is included as a sub-module of this repo, and which `phonetic.cpp` expects to find at `../data/CMUdict/cmudict-0.7b`, relative to itself. 
+You can include use this in your own projects: you'll need the header file (`include/phonetic.hpp`), the source file (`src/phonetic.cpp`), and the CMUdict data, which is included as a sub-module of this repo, and which `phonetic.cpp` expects to find at `../data/CMUdict/cmudict-0.7b`, relative to itself. 
 
 This can also be compiled with CMake:
 
@@ -25,7 +25,7 @@ make
 
 Which will also build a `build/tests/test_phonetic` Catch-2 test file.
 
-I've also set this library up to be easily compiled to WebAssembly using Emscripten:
+This library can also be compiled to WebAssembly using Emscripten:
 ```
 mdkir build
 cd build
