@@ -8,12 +8,6 @@
 
 struct Fixture {
     mutable Phonetic dict;
-
-    // bool import_success{};
-
-    // Fixture() {
-        // bool import_success = dict.import_dictionary();
-    // }
 };
 
 
