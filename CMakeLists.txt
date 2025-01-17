@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.15)
 project(phonetic)
 
 # Set C++ standard
@@ -50,3 +50,26 @@ else()
     # Test directory
     add_subdirectory(tests)
 endif()
+
+if (CMAKE_VERSION VERSION_LESS 3.18)
+    set(DEV_MODULE Development)
+else()
+    set(DEV_MODULE Development.Module)
+endif()
+find_package(Python 3.12 COMPONENTS Interpreter ${DEV_MODULE} REQUIRED)
+
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+set_target_properties(phonetic PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+execute_process(
+    COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+    OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
+find_package(nanobind CONFIG REQUIRED)
+
+nanobind_add_module(phoneticpy src/phoneticpy.cpp)
+target_include_directories(phoneticpy PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(phoneticpy PRIVATE phonetic)
