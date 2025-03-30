@@ -12,9 +12,13 @@ There's various tooling built around it, e.g. [this lovely Python library](https
 
 ## Build
 
-You can include use this in your own projects: you'll need the header file (`include/phonetic.hpp`), the source file (`src/phonetic.cpp`), and the CMUdict data, which is included as a sub-module of this repo, and which `phonetic.cpp` expects to find at `../data/CMUdict/cmudict-0.7b`, relative to itself. 
+Includes CMUdict as a sub-module. To load that data use:
 
-This can also be compiled with CMake:
+```
+git submodule update --init --recursive
+```
+
+To compile this project with CMake:
 
 ```
 mkdir build

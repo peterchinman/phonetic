@@ -3,7 +3,12 @@ add_library(phonetic
     phonetic.cpp
 )
 
-set(CMU_DICT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../data/CMUdict/cmudict-0.7b")
+# Define CMU_DICT_PATH based on the build type
+if(EMSCRIPTEN)
+    set(CMU_DICT_PATH "/data/cmudict-0.7b")
+else()
+    set(CMU_DICT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../data/CMUdict/cmudict-0.7b")
+endif()
 target_compile_definitions(phonetic PUBLIC CMU_DICT_PATH="${CMU_DICT_PATH}")
 
 # Include header files
