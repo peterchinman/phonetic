@@ -40,9 +40,12 @@ emmake make
 This will generate a `phonetic.js`, `phonetic.wasm`, and `phonetic.data`. Using these you'll be able to call any of the `Phonetic` class methods straight from Javascript.
 
 Thanks to @nwoods, this project now has python bindings. From the project root directory run:
+
 ```
-pip install
+pip install . 
 ```
+
+You'll then be able to run all of the class methods from inside the tidy confines of Python.
 
 ## Usage
 
