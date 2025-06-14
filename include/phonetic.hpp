@@ -5,7 +5,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
+#include <expected>
+#include <string_view>
 
 class Phonetic {
 private:
@@ -15,6 +16,16 @@ private:
 // TODO mark functions as const that don't change state
 
 public:
+    // Error type for std::expected
+    struct Error {
+        std::string message;
+    };
+
+    // Result type for text_to_phones
+    struct WordResult {
+        std::string word;
+        std::expected<std::vector<std::string>, Error> pronunciations;
+    };
 
     // Runs import_dictionary();
     Phonetic();
@@ -25,22 +36,24 @@ public:
     /**
      * Get array of possible pronunciations from CMUdict.
      * 
-     * Throws a std::exception if word not found.
-     * 
      * @param (string) word: English word to look up.
-     * @return Vector of strings, of the possible pronunciations recorded in the dictionary, each of which are a string of ARAPBET phones separated by spaces.
+     * @return std::expected containing either Vector of strings, of the possible 
+     pronunciations recorded in the dictionary, each 
+     of which are a string of ARAPBET phones separated 
+     by spaces.
     */
-    std::vector<std::string> word_to_phones(std::string word);
+    std::expected<std::vector<std::string>, Error> word_to_phones(std::string word);
 
     /**
-     * Get an array of possible pronuncitation of each word from a text.
-     * 
-     * If a word is not found, vector will contain the word that was searched for, and bool is marked false.
+     * Get an array of possible pronunciations of each word from a text.
+     * Each word is processed independently, allowing individual words to fail
+     * without affecting the processing of other words.
      * 
      * @param text (string): text to look up
-     * @return An array of pairs, each pair has 1. array of possible pronunciations, 2. a bool flag indicating if word was found.
+     * @return Vector of WordResult, each containing the original word and either
+     *         its pronunciations or an error if the word wasn't found
     */
-    std::vector<std::pair<std::vector<std::string>, bool>> text_to_phones(const std::string & text);
+    std::vector<WordResult> text_to_phones(const std::string & text);
 
      /**
      * Takes a string of space-separated CMUdict phones, returns a string of the stresses.
@@ -55,12 +68,10 @@ public:
     /**
      * Takes an English word and returns a vector of possible stresses.
      * 
-     * TODO: should do exception handling here as well. 
-     * 
      * @param (string) word: English word
-     * @return (vector<string>): vector of strings of stresses
+     * @return std::expected containing either vector of stress patterns or error
     */
-    std::vector<std::string> word_to_stresses(const std::string& word);
+    std::expected<std::vector<std::string>, Error> word_to_stresses(const std::string& word);
 
     /**
      * Take a string of space-separated CMUdict phones, returns number of syllables.
@@ -76,10 +87,9 @@ public:
      * (Most words have a single syllable count even across multiple pronunciations, but this catches the outliers, e.g. "fire".)
      * 
      * @param (string) word: English word
-     * @return (vector<int>): possible numbers of syllables
+     * @return std::expected containing either vector of syllable counts or error
     */
-    std::vector<int> word_to_syllable_counts(const std::string& word);
-
+    std::expected<std::vector<int>, Error> word_to_syllable_counts(const std::string& word);
 
     /**
      * Get the rhyming part from a string of space-separated phones.

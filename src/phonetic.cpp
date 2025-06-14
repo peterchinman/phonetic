@@ -64,7 +64,7 @@ bool Phonetic::import_dictionary() {
     return true;
 }
 
-std::vector<std::string> Phonetic::word_to_phones(std::string word) {
+std::expected<std::vector<std::string>, Phonetic::Error> Phonetic::word_to_phones(std::string word) {
     // capitalize all queries
     std::transform(word.begin(), word.end(), word.begin(), ::toupper);
     auto it = m_dictionary.find(word);
@@ -72,29 +72,23 @@ std::vector<std::string> Phonetic::word_to_phones(std::string word) {
         return it->second;
     }
     else {
-        throw std::runtime_error(word + " not found in dictionary.");
+        return std::unexpected(Error{word + " not found in dictionary."});
     }
 }
 
-std::vector<std::pair<std::vector<std::string>, bool>> Phonetic::text_to_phones(const std::string & text) {
-
-    std::vector<std::pair<std::vector<std::string>, bool>> results{};
+std::vector<Phonetic::WordResult> Phonetic::text_to_phones(const std::string & text) {
+    std::vector<WordResult> results{};
     std::vector<std::string> words {strip_punctuation(text)};
 
     for (const auto & w : words) {
-        try {
-            std::vector<std::string> phones{word_to_phones(w)};
-            results.emplace_back(phones, true);
-        } catch (const std::exception &) {
-            std::vector<std::string> word_searched_for{};
-            word_searched_for.emplace_back(w);
-            results.emplace_back(word_searched_for, false);
-        }
+        results.push_back(WordResult{
+            .word = w,
+            .pronunciations = word_to_phones(w)
+        });
     }
 
     return results;
 }
-
 
 std::string Phonetic::phone_to_stress(const std::string& phones) {
     std::string stresses{};
@@ -106,11 +100,15 @@ std::string Phonetic::phone_to_stress(const std::string& phones) {
     return stresses;
 }
 
-std::vector<std::string> Phonetic::word_to_stresses(const std::string& word) {
+std::expected<std::vector<std::string>, Phonetic::Error> Phonetic::word_to_stresses(const std::string& word) {
     std::vector<std::string> stresses{};
 
-    std::vector<std::string> phones{word_to_phones(word)};
-    for (const auto & p : phones) {
+    auto phones = word_to_phones(word);
+    if (!phones) {
+        return std::unexpected(phones.error());
+    }
+
+    for (const auto & p : phones.value()) {
         stresses.emplace_back(phone_to_stress(p));
     }
     return stresses;
@@ -120,10 +118,15 @@ int Phonetic::phone_to_syllable_count(const std::string& phones) {
     return static_cast<int>(phone_to_stress(phones).length());
 }
 
-std::vector<int> Phonetic::word_to_syllable_counts(const std::string& word) {
+std::expected<std::vector<int>, Phonetic::Error> Phonetic::word_to_syllable_counts(const std::string& word) {
     std::vector<int> syllables;
-    std::vector<std::string> phones{word_to_phones(word)};
-    for(const auto & p : phones) {
+    
+    auto phones = word_to_phones(word);
+    if (!phones) {
+        return std::unexpected(phones.error());
+    }
+
+    for(const auto & p : phones.value()) {
         syllables.emplace_back(phone_to_syllable_count(p));
     }
     return syllables;
@@ -168,9 +171,14 @@ std::string Phonetic::get_rhyming_part(const std::string& phones) {
 
 #ifdef __EMSCRIPTEN__
 EMSCRIPTEN_BINDINGS(my_module) {
-
     emscripten::register_vector<std::string>("StringVector");
 
+    emscripten::class_<Phonetic::Error>("Error")
+        .property("message", &Phonetic::Error::message);
+
+    emscripten::class_<Phonetic::WordResult>("WordResult")
+        .property("word", &Phonetic::WordResult::word)
+        .property("pronunciations", &Phonetic::WordResult::pronunciations);
 
     emscripten::class_<Phonetic>("Phonetic")
         .constructor<>()

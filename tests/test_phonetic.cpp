@@ -10,23 +10,25 @@ struct Fixture {
     mutable Phonetic dict;
 };
 
-
 TEST_CASE_PERSISTENT_FIXTURE(Fixture, "Dictionary tests") {
     SECTION ("dictionary import success") {
     }
     SECTION("word_to_phones") {
-        std::vector<std::string> word_lower = dict.word_to_phones("associate");
-        REQUIRE(word_lower.size() == 4);
-        REQUIRE(word_lower[0] == "AH0 S OW1 S IY0 AH0 T");
+        auto word_lower = dict.word_to_phones("associate");
+        REQUIRE(word_lower.has_value());
+        REQUIRE(word_lower.value().size() == 4);
+        REQUIRE(word_lower.value()[0] == "AH0 S OW1 S IY0 AH0 T");
         // upper case
-        std::vector<std::string> word_upper = dict.word_to_phones("ASSOCIATE");
-        REQUIRE(word_upper.size() == 4);
-        REQUIRE(word_upper[0] == "AH0 S OW1 S IY0 AH0 T");
+        auto word_upper = dict.word_to_phones("ASSOCIATE");
+        REQUIRE(word_upper.has_value());
+        REQUIRE(word_upper.value().size() == 4);
+        REQUIRE(word_upper.value()[0] == "AH0 S OW1 S IY0 AH0 T");
     }
 
-    SECTION("word_to_phones exception") {
-        std::vector<std::string> bad_word{};
-        REQUIRE_THROWS(bad_word = dict.word_to_phones("sdfasdg"));
+    SECTION("word_to_phones error") {
+        auto bad_word = dict.word_to_phones("sdfasdg");
+        REQUIRE(!bad_word.has_value());
+        REQUIRE(bad_word.error().message == "SDFASDG not found in dictionary.");
     } 
 
     SECTION("phone_to_stress") {
@@ -35,9 +37,10 @@ TEST_CASE_PERSISTENT_FIXTURE(Fixture, "Dictionary tests") {
     }
 
     SECTION("word_to_stresses") {
-        std::vector<std::string> stresses{dict.word_to_stresses("atoll")};
-        REQUIRE(stresses[0] == "12");
-        REQUIRE(stresses[2] == "01");
+        auto stresses = dict.word_to_stresses("atoll");
+        REQUIRE(stresses.has_value());
+        REQUIRE(stresses.value()[0] == "12");
+        REQUIRE(stresses.value()[2] == "01");
     }
 
     SECTION("phone_to_syllable_count") {
@@ -45,34 +48,44 @@ TEST_CASE_PERSISTENT_FIXTURE(Fixture, "Dictionary tests") {
     }
 
     SECTION("word_to_syllable_counts") {
-        std::vector<int> fire = dict.word_to_syllable_counts("fire");
-        REQUIRE(fire.size() == 2);
-        REQUIRE(fire[0] == 2);
-        REQUIRE(fire[1] == 1);
+        auto fire = dict.word_to_syllable_counts("fire");
+        REQUIRE(fire.has_value());
+        REQUIRE(fire.value().size() == 2);
+        REQUIRE(fire.value()[0] == 2);
+        REQUIRE(fire.value()[1] == 1);
     }
 
     SECTION("text_to_phones simple") {
         std::string text{"smelly dog"};
-        std::vector<std::pair<std::vector<std::string>, bool>> phones{dict.text_to_phones(text)};
-        REQUIRE(phones.size() == 2);
-        REQUIRE(phones[0].first[0] == "S M EH1 L IY0");
-        REQUIRE(phones[1].first[0] == "D AO1 G");
+        auto results = dict.text_to_phones(text);
+        REQUIRE(results.size() == 2);
+        REQUIRE(results[0].word == "smelly");
+        REQUIRE(results[0].pronunciations.has_value());
+        REQUIRE(results[0].pronunciations.value()[0] == "S M EH1 L IY0");
+        REQUIRE(results[1].word == "dog");
+        REQUIRE(results[1].pronunciations.has_value());
+        REQUIRE(results[1].pronunciations.value()[0] == "D AO1 G");
     }
   
     SECTION("text_to_phones complex punct") {
         std::string text{"Smelly dog? Drip-dry--good dog."};
-        std::vector<std::pair<std::vector<std::string>, bool>> phones{dict.text_to_phones(text)};
-        REQUIRE(phones.size() == 5);
-        REQUIRE(phones[0].first[0] == "S M EH1 L IY0");
-        REQUIRE(phones[2].first[0] == "D R IH1 P D R AY1");
+        auto results = dict.text_to_phones(text);
+        REQUIRE(results.size() == 5);
+        REQUIRE(results[0].word == "Smelly");
+        REQUIRE(results[0].pronunciations.has_value());
+        REQUIRE(results[0].pronunciations.value()[0] == "S M EH1 L IY0");
+        REQUIRE(results[2].word == "Drip-dry");
+        REQUIRE(results[2].pronunciations.has_value());
+        REQUIRE(results[2].pronunciations.value()[0] == "D R IH1 P D R AY1");
     }
 
-    SECTION("text_to_phones exceptions") {
+    SECTION("text_to_phones errors") {
         std::string text{"Smelly dog? asdfaga"};
-        std::vector<std::pair<std::vector<std::string>, bool>> phones{dict.text_to_phones(text)};
-        REQUIRE(phones.size() == 3);
-        REQUIRE(phones[2].second == false);
-        REQUIRE(phones[2].first[0] == "asdfaga");
+        auto results = dict.text_to_phones(text);
+        REQUIRE(results.size() == 3);
+        REQUIRE(results[2].word == "asdfaga");
+        REQUIRE(!results[2].pronunciations.has_value());
+        REQUIRE(results[2].pronunciations.error().message == "ASDFAGA not found in dictionary.");
     }
 
     SECTION("get_rhyming_part") {
@@ -89,6 +102,5 @@ TEST_CASE_PERSISTENT_FIXTURE(Fixture, "Dictionary tests") {
         phones = "DH S K";
         REQUIRE(dict.get_rhyming_part(phones) == "");
     }
-    
 }
 
