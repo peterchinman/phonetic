@@ -72,7 +72,7 @@ std::expected<std::vector<std::string>, Phonetic::Error> Phonetic::word_to_phone
         return it->second;
     }
     else {
-        return std::unexpected(Error{word + " not found in dictionary."});
+        return std::unexpected(Error{word});
     }
 }
 
