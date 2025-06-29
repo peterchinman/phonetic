@@ -72,7 +72,7 @@ std::expected<std::vector<std::string>, Phonetic::Error> Phonetic::word_to_phone
         return it->second;
     }
     else {
-        return std::unexpected(Error{word + " not found in dictionary."});
+        return std::unexpected(Error{word});
     }
 }
 
@@ -81,10 +81,7 @@ std::vector<Phonetic::WordResult> Phonetic::text_to_phones(const std::string & t
     std::vector<std::string> words {strip_punctuation(text)};
 
     for (const auto & w : words) {
-        results.push_back(WordResult{
-            .word = w,
-            .pronunciations = word_to_phones(w)
-        });
+        results.emplace_back(w, word_to_phones(w));
     }
 
     return results;

@@ -18,7 +18,7 @@ private:
 public:
     // Error type for std::expected
     struct Error {
-        std::string message;
+        std::string unidentified_word;
     };
 
     // Result type for text_to_phones
@@ -37,21 +37,15 @@ public:
      * Get array of possible pronunciations from CMUdict.
      * 
      * @param (string) word: English word to look up.
-     * @return std::expected containing either Vector of strings, of the possible 
-     pronunciations recorded in the dictionary, each 
-     of which are a string of ARAPBET phones separated 
-     by spaces.
+     * @return std::expected containing either Vector of strings, of the possible pronunciations recorded in the dictionary, each of which are a string of ARAPBET phones separated by spaces.
     */
     std::expected<std::vector<std::string>, Error> word_to_phones(std::string word);
 
     /**
      * Get an array of possible pronunciations of each word from a text.
-     * Each word is processed independently, allowing individual words to fail
-     * without affecting the processing of other words.
      * 
      * @param text (string): text to look up
-     * @return Vector of WordResult, each containing the original word and either
-     *         its pronunciations or an error if the word wasn't found
+     * @return Vector of WordResult, each containing the original word and either its pronunciations or an error if the word wasn't found
     */
     std::vector<WordResult> text_to_phones(const std::string & text);
 
