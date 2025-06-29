@@ -22,7 +22,7 @@ public:
     };
 
     // Result type for text_to_phones
-    struct WordResult {
+    struct TextToPhonesResult {
         std::string word;
         std::expected<std::vector<std::string>, Error> pronunciations;
     };
@@ -50,10 +50,10 @@ public:
      * without affecting the processing of other words.
      * 
      * @param text (string): text to look up
-     * @return Vector of WordResult, each containing the original word and either
+     * @return Vector of TextToPhonesResult, each containing the original word and either
      *         its pronunciations or an error if the word wasn't found
     */
-    std::vector<WordResult> text_to_phones(const std::string & text);
+    std::vector<TextToPhonesResult> text_to_phones(const std::string & text);
 
      /**
      * Takes a string of space-separated CMUdict phones, returns a string of the stresses.
