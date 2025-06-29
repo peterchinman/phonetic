@@ -28,7 +28,7 @@ TEST_CASE_PERSISTENT_FIXTURE(Fixture, "Dictionary tests") {
     SECTION("word_to_phones error") {
         auto bad_word = dict.word_to_phones("sdfasdg");
         REQUIRE(!bad_word.has_value());
-        REQUIRE(bad_word.error().message == "SDFASDG not found in dictionary.");
+        REQUIRE(bad_word.error().unidentified_word == "SDFASDG");
     } 
 
     SECTION("phone_to_stress") {
@@ -55,37 +55,45 @@ TEST_CASE_PERSISTENT_FIXTURE(Fixture, "Dictionary tests") {
         REQUIRE(fire.value()[1] == 1);
     }
 
-    SECTION("text_to_phones simple") {
+     SECTION("text_to_phones simple") {
         std::string text{"smelly dog"};
         auto results = dict.text_to_phones(text);
-        REQUIRE(results.size() == 2);
-        REQUIRE(results[0].word == "smelly");
-        REQUIRE(results[0].pronunciations.has_value());
-        REQUIRE(results[0].pronunciations.value()[0] == "S M EH1 L IY0");
-        REQUIRE(results[1].word == "dog");
-        REQUIRE(results[1].pronunciations.has_value());
-        REQUIRE(results[1].pronunciations.value()[0] == "D AO1 G");
+        REQUIRE(results.words_with_pronunciations.size() == 2);
+        REQUIRE(results.failed_words.empty());
+        REQUIRE(!results.has_failures());
+        
+        REQUIRE(results.words_with_pronunciations[0].first == "smelly");
+        REQUIRE(results.words_with_pronunciations[0].second[0] == "S M EH1 L IY0");
+        REQUIRE(results.words_with_pronunciations[1].first == "dog");
+        REQUIRE(results.words_with_pronunciations[1].second[0] == "D AO1 G");
     }
   
     SECTION("text_to_phones complex punct") {
         std::string text{"Smelly dog? Drip-dry--good dog."};
         auto results = dict.text_to_phones(text);
-        REQUIRE(results.size() == 5);
-        REQUIRE(results[0].word == "Smelly");
-        REQUIRE(results[0].pronunciations.has_value());
-        REQUIRE(results[0].pronunciations.value()[0] == "S M EH1 L IY0");
-        REQUIRE(results[2].word == "Drip-dry");
-        REQUIRE(results[2].pronunciations.has_value());
-        REQUIRE(results[2].pronunciations.value()[0] == "D R IH1 P D R AY1");
+        REQUIRE(results.words_with_pronunciations.size() == 5);
+        REQUIRE(results.failed_words.empty());
+        REQUIRE(!results.has_failures());
+        
+        REQUIRE(results.words_with_pronunciations[0].first == "Smelly");
+        REQUIRE(results.words_with_pronunciations[0].second[0] == "S M EH1 L IY0");
+        REQUIRE(results.words_with_pronunciations[2].first == "Drip-dry");
+        REQUIRE(results.words_with_pronunciations[2].second[0] == "D R IH1 P D R AY1");
     }
 
     SECTION("text_to_phones errors") {
         std::string text{"Smelly dog? asdfaga"};
         auto results = dict.text_to_phones(text);
-        REQUIRE(results.size() == 3);
-        REQUIRE(results[2].word == "asdfaga");
-        REQUIRE(!results[2].pronunciations.has_value());
-        REQUIRE(results[2].pronunciations.error().message == "ASDFAGA not found in dictionary.");
+        REQUIRE(results.words_with_pronunciations.size() == 3);
+        REQUIRE(results.failed_words.size() == 1);
+        REQUIRE(results.has_failures());
+        
+        REQUIRE(results.words_with_pronunciations[0].first == "Smelly");
+        REQUIRE(results.words_with_pronunciations[1].first == "dog");
+        REQUIRE(results.words_with_pronunciations[2].first == "asdfaga");
+        REQUIRE(results.words_with_pronunciations[2].second.empty()); // Failed word has empty pronunciations
+        
+        REQUIRE(results.failed_words[0] == "ASDFAGA");
     }
 
     SECTION("get_rhyming_part") {

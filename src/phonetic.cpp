@@ -76,15 +76,18 @@ std::expected<std::vector<std::string>, Phonetic::Error> Phonetic::word_to_phone
     }
 }
 
-std::vector<Phonetic::WordResult> Phonetic::text_to_phones(const std::string & text) {
-    std::vector<WordResult> results{};
+Phonetic::TextToPhonesResult Phonetic::text_to_phones(const std::string & text) {
+    TextToPhonesResult results{};
     std::vector<std::string> words {strip_punctuation(text)};
 
     for (const auto & w : words) {
-        results.push_back(WordResult{
-            .word = w,
-            .pronunciations = word_to_phones(w)
-        });
+        auto phones = word_to_phones(w);
+        if (!phones.has_value()) {
+            results.failed_words.push_back(phones.error().unidentified_word);
+        }
+        
+        results.words_with_pronunciations.push_back(std::make_pair(w, phones.value_or(std::vector<std::string>{})));
+
     }
 
     return results;
@@ -176,9 +179,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::class_<Phonetic::Error>("Error")
         .property("message", &Phonetic::Error::message);
 
-    emscripten::class_<Phonetic::WordResult>("WordResult")
-        .property("word", &Phonetic::WordResult::word)
-        .property("pronunciations", &Phonetic::WordResult::pronunciations);
+    emscripten::class_<Phonetic::TextToPhonesResult>("TextToPhonesResult")
+        .property("words_with_pronunciations", &Phonetic::TextToPhonesResult::words_with_pronunciations)
+        .property("failed_words", &Phonetic::TextToPhonesResult::failed_words);
 
     emscripten::class_<Phonetic>("Phonetic")
         .constructor<>()

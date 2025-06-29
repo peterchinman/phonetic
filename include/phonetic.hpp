@@ -23,8 +23,9 @@ public:
 
     // Result type for text_to_phones
     struct TextToPhonesResult {
-        std::string word;
-        std::expected<std::vector<std::string>, Error> pronunciations;
+        std::vector<std::pair<std::string, std::vector<std::string>>> words_with_pronunciations;
+        std::vector<std::string> failed_words;
+        bool has_failures() const { return !failed_words.empty(); }
     };
 
     // Runs import_dictionary();
@@ -46,14 +47,11 @@ public:
 
     /**
      * Get an array of possible pronunciations of each word from a text.
-     * Each word is processed independently, allowing individual words to fail
-     * without affecting the processing of other words.
      * 
      * @param text (string): text to look up
-     * @return Vector of TextToPhonesResult, each containing the original word and either
-     *         its pronunciations or an error if the word wasn't found
+     * @return TextToPhonesResult containing an arrary of pairs of words and their pronunciations (if found), along with an array of words that were not found. 
     */
-    std::vector<TextToPhonesResult> text_to_phones(const std::string & text);
+    TextToPhonesResult text_to_phones(const std::string & text);
 
      /**
      * Takes a string of space-separated CMUdict phones, returns a string of the stresses.
