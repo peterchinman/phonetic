@@ -177,7 +177,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::register_vector<std::string>("StringVector");
 
     emscripten::class_<Phonetic::Error>("Error")
-        .property("message", &Phonetic::Error::message);
+        .property("unidentified_word", &Phonetic::Error::unidentified_word);
 
     emscripten::class_<Phonetic::TextToPhonesResult>("TextToPhonesResult")
         .property("words_with_pronunciations", &Phonetic::TextToPhonesResult::words_with_pronunciations)
