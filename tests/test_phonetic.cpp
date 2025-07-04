@@ -31,8 +31,8 @@ TEST_CASE_PERSISTENT_FIXTURE(Fixture, "Dictionary tests") {
         REQUIRE(bad_word.error().unidentified_word == "SDFASDG");
     } 
 
-    SECTION("phone_to_stress") {
-        std::string stresses = dict.phone_to_stress("M AA1 D ER0 N AY2 Z D");
+    SECTION("phones_to_stresses") {
+        std::string stresses = dict.phones_to_stresses("M AA1 D ER0 N AY2 Z D");
         REQUIRE(stresses == "102");
     }
 

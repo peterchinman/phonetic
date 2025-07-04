@@ -61,7 +61,7 @@ public:
      * @param (string) phones: space-separated CMUdict phones
      * @return (string): String of stresses
     */
-    std::string phone_to_stress(const std::string& phones);
+    std::string phones_to_stresses(const std::string& phones);
 
     /**
      * Takes an English word and returns a vector of possible stresses.

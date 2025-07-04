@@ -93,7 +93,7 @@ Phonetic::TextToPhonesResult Phonetic::text_to_phones(const std::string & text) 
     return results;
 }
 
-std::string Phonetic::phone_to_stress(const std::string& phones) {
+std::string Phonetic::phones_to_stresses(const std::string& phones) {
     std::string stresses{};
     for (const auto & c : phones){
         if (c == '0' || c == '1' || c == '2') {
@@ -112,13 +112,13 @@ std::expected<std::vector<std::string>, Phonetic::Error> Phonetic::word_to_stres
     }
 
     for (const auto & p : phones.value()) {
-        stresses.emplace_back(phone_to_stress(p));
+        stresses.emplace_back(phones_to_stresses(p));
     }
     return stresses;
 }
 
 int Phonetic::phone_to_syllable_count(const std::string& phones) {
-    return static_cast<int>(phone_to_stress(phones).length());
+    return static_cast<int>(phones_to_stresses(phones).length());
 }
 
 std::expected<std::vector<int>, Phonetic::Error> Phonetic::word_to_syllable_counts(const std::string& word) {
@@ -187,7 +187,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
         .constructor<>()
         .function("word_to_phones", &Phonetic::word_to_phones)
         .function("text_to_phones", &Phonetic::text_to_phones)
-        .function("phone_to_stress", &Phonetic::phone_to_stress)
+        .function("phones_to_stresses", &Phonetic::phones_to_stresses)
         .function("word_to_stresses", &Phonetic::word_to_stresses)
         .function("phone_to_syllable_count", &Phonetic::phone_to_syllable_count)
         .function("word_to_syllable_counts", &Phonetic::word_to_syllable_counts)
